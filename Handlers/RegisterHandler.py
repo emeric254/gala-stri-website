@@ -10,9 +10,6 @@ logger = logging.getLogger(__name__)
 class RegisterHandler(BaseHandler):
     """handle / endpoint"""
 
-    def initialize(self):
-        self.conn = PostgreSQL.get_session()
-
     def get(self):
         """Serve Get and return main page"""
         self.render('register.html')
