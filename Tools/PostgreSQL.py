@@ -42,17 +42,17 @@ def init_db():
         cur.execute("CREATE TYPE status_accompagnateur AS ENUM ('attente', 'refus', 'valide');")
     cur.execute("CREATE TABLE IF NOT EXISTS personnes ("
                 "id SERIAL PRIMARY KEY,"
-                "nom VARCHAR(64) NOT NULL,"
                 "prenom VARCHAR(64) NOT NULL,"
+                "nom VARCHAR(64) NOT NULL,"
                 "status personne_type NOT NULL,"
                 "paiement BOOL NOT NULL DEFAULT FALSE);")
     cur.execute("CREATE TABLE IF NOT EXISTS inscrits ("
-                "f_id_personne SERIAL PRIMARY KEY REFERENCES personnes (id),"
+                "f_id_personne INT NOT NULL PRIMARY KEY REFERENCES personnes (id),"
                 "courriel VARCHAR(96) NOT NULL,"
                 "promo int NOT NULL);")
     cur.execute("CREATE TABLE IF NOT EXISTS accompagnateurs ("
-                "f_id_personne SERIAL REFERENCES personnes (id),"
-                "f_id_inscrit SERIAL REFERENCES inscrits (f_id_personne),"
+                "f_id_personne INT NOT NULL REFERENCES personnes (id),"
+                "f_id_inscrit INT NOT NULL REFERENCES inscrits (f_id_personne),"
                 "status status_accompagnateur NOT NULL DEFAULT 'attente',"
                 "PRIMARY KEY(f_id_personne, f_id_inscrit));")
     conn.commit()
@@ -63,8 +63,33 @@ def init_db():
 def reset_db():
     conn = get_session()
     cur = conn.cursor()
+    cur.execute("DELETE FROM accompagnateurs; DELETE FROM inscrits; DELETE FROM personnes;")
     cur.execute("DROP TABLE accompagnateurs; DROP TABLE inscrits; DROP TABLE personnes;")
     cur.execute("DROP TYPE personne_type; DROP TYPE status_accompagnateur;")
     conn.commit()
     cur.close()
     conn.close()
+
+
+def insert_inscrit(prenom: str, nom: str, status: str, courriel: str, promotion: int):
+    success = False
+    conn = get_session()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO personnes (prenom, nom, status) VALUES (%s, %s, %s);", (prenom, nom, status))
+    cur.execute("SELECT currval(pg_get_serial_sequence('personnes','id'));")
+    inserted_id = cur.fetchone()
+    if inserted_id:
+        cur.execute("INSERT INTO inscrits (f_id_personne, courriel, promo) VALUES (%s, %s, %s);",
+                    (inserted_id[0], courriel, promotion))
+        cur.execute("SELECT currval(pg_get_serial_sequence('inscrits','f_id_personne'));")
+        inserted_id = cur.fetchone()
+        if inserted_id:
+            conn.commit()
+            success = True
+        else:
+            conn.rollback()
+    else:
+        conn.rollback()
+    cur.close()
+    conn.close()
+    return success
