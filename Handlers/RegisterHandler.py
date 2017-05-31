@@ -29,8 +29,8 @@ class RegisterHandler(BaseHandler):
         size = size if size < 11 else 10
         if size == len(nom_accompagnateurs):
             for i in range(0, size):
-                a_prenom = escape.xhtml_escape(prenom_accompagnateurs[i])
-                a_nom = escape.xhtml_escape(nom_accompagnateurs[i])
+                a_prenom = escape.xhtml_escape(prenom_accompagnateurs[i])[:64]
+                a_nom = escape.xhtml_escape(nom_accompagnateurs[i])[:64]
                 if not a_prenom or not a_nom:
                     self.send_error(status_code=400)
                     return
