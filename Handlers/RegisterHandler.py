@@ -27,14 +27,12 @@ class RegisterHandler(BaseHandler):
         accompagnateurs = []
         size = len(prenom_accompagnateurs)
         size = size if size < 11 else 10
-        if size == len(nom_accompagnateurs):
+        if size and size == len(nom_accompagnateurs):
             for i in range(0, size):
                 a_prenom = escape.xhtml_escape(prenom_accompagnateurs[i])[:64]
                 a_nom = escape.xhtml_escape(nom_accompagnateurs[i])[:64]
-                if not a_prenom or not a_nom:
-                    self.send_error(status_code=400)
-                    return
-                accompagnateurs.append((a_prenom, a_nom))
+                if a_prenom and a_nom:
+                    accompagnateurs.append((a_prenom, a_nom))
         if VerifyFields.verify_all(prenom, nom, courriel, genre, promotion, accompagnateurs):
             if PostgreSQL.insert_inscrit(prenom, nom, genre, courriel, promotion, accompagnateurs):
                 self.render('registered.html')

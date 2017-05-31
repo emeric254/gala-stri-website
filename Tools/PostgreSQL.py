@@ -74,7 +74,11 @@ def reset_db():
 
 def insert_accompagnants(cur, inscrit_id: int, accompagnateurs: list):
     for (a_prenom, a_nom) in accompagnateurs:
-        cur.execute("INSERT INTO personnes (prenom, nom, status) VALUES (%s, %s, %s);", (a_prenom, a_nom, 'autre'))
+        try:
+            cur.execute("INSERT INTO personnes (prenom, nom, status) VALUES (%s, %s, %s);", (a_prenom, a_nom, 'autre'))
+        except psycopg2.IntegrityError as err:
+            logger.warning(str(err))
+            return False
         cur.execute("SELECT currval(pg_get_serial_sequence('personnes','id'));")
         inserted_a_id = cur.fetchone()
         if inserted_a_id:
