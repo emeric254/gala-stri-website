@@ -20,7 +20,7 @@ def get_conf():
     db_password = '123456789'
     if 'OPENSHIFT_POSTGRESQL_DB_PASSWORD' in os.environ:
         db_password = os.environ['OPENSHIFT_POSTGRESQL_DB_PASSWORD']
-    db_name = 'postgres'
+    db_name = 'sampledb'
     return db_host, db_port, db_user, db_password, db_name
 
 
