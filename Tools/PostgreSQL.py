@@ -31,44 +31,44 @@ def get_session():
 
 def init_db():
     conn = get_session()
-    cur = conn.cursor()
-    cur.execute("SELECT 1 FROM pg_type WHERE typname = 'personne_type'")
-    result = cur.fetchone()
-    if not result:
-        cur.execute("CREATE TYPE personne_type AS ENUM ('personnel', 'professionnel', 'ancien', 'etudiant', 'autre');")
-    cur.execute("SELECT 1 FROM pg_type WHERE typname = 'status_accompagnateur'")
-    result = cur.fetchone()
-    if not result:
-        cur.execute("CREATE TYPE status_accompagnateur AS ENUM ('attente', 'refus', 'valide');")
-    cur.execute("CREATE TABLE IF NOT EXISTS personnes ("
-                "id SERIAL PRIMARY KEY,"
-                "prenom VARCHAR(64) NOT NULL,"
-                "nom VARCHAR(64) NOT NULL,"
-                "status personne_type NOT NULL,"
-                "paiement BOOL NOT NULL DEFAULT FALSE,"
-                "UNIQUE (prenom, nom));")
-    cur.execute("CREATE TABLE IF NOT EXISTS inscrits ("
-                "f_id_personne INT NOT NULL PRIMARY KEY REFERENCES personnes (id),"
-                "courriel VARCHAR(96) NOT NULL,"
-                "promo int NOT NULL);")
-    cur.execute("CREATE TABLE IF NOT EXISTS accompagnants ("
-                "f_id_personne INT NOT NULL REFERENCES personnes (id),"
-                "f_id_inscrit INT NOT NULL REFERENCES inscrits (f_id_personne),"
-                "validation status_accompagnateur NOT NULL DEFAULT 'attente',"
-                "PRIMARY KEY(f_id_personne, f_id_inscrit));")
-    conn.commit()
-    cur.close()
+    with conn.cursor() as cur:
+        cur.execute("SELECT 1 FROM pg_type WHERE typname = 'personne_type'")
+        result = cur.fetchone()
+        if not result:
+            cur.execute("CREATE TYPE personne_type AS ENUM ('personnel', 'professionnel', 'ancien', 'etudiant', 'autre');")
+        cur.execute("SELECT 1 FROM pg_type WHERE typname = 'status_accompagnateur'")
+        result = cur.fetchone()
+        if not result:
+            cur.execute("CREATE TYPE status_accompagnateur AS ENUM ('attente', 'refus', 'valide');")
+        cur.execute("CREATE TABLE IF NOT EXISTS personnes ("
+                    "id SERIAL PRIMARY KEY,"
+                    "prenom VARCHAR(64) NOT NULL,"
+                    "nom VARCHAR(64) NOT NULL,"
+                    "status personne_type NOT NULL,"
+                    "paiement BOOL NOT NULL DEFAULT FALSE,"
+                    "UNIQUE (prenom, nom));")
+        cur.execute("CREATE TABLE IF NOT EXISTS inscrits ("
+                    "f_id_personne INT NOT NULL PRIMARY KEY REFERENCES personnes (id),"
+                    "courriel VARCHAR(96) NOT NULL,"
+                    "promo int NOT NULL);")
+        cur.execute("CREATE TABLE IF NOT EXISTS accompagnants ("
+                    "f_id_personne INT NOT NULL REFERENCES personnes (id),"
+                    "f_id_inscrit INT NOT NULL REFERENCES inscrits (f_id_personne),"
+                    "validation status_accompagnateur NOT NULL DEFAULT 'attente',"
+                    "PRIMARY KEY(f_id_personne, f_id_inscrit));")
+        conn.commit()
     conn.close()
 
 
 def reset_db():
     conn = get_session()
-    cur = conn.cursor()
-    cur.execute("TRUNCATE TABLE accompagnants, inscrits, personnes;")
-    cur.execute("DROP TABLE accompagnants; DROP TABLE inscrits; DROP TABLE personnes;")
-    cur.execute("DROP TYPE personne_type; DROP TYPE status_accompagnateur;")
-    conn.commit()
-    cur.close()
+    with conn.cursor() as cur:
+        cur.execute("DROP TABLE IF EXISTS accompagnants;"
+                    "DROP TABLE IF EXISTS inscrits;"
+                    "DROP TABLE IF EXISTS personnes;")
+        cur.execute("DROP TYPE IF EXISTS personne_type;"
+                    "DROP TYPE IF EXISTS status_accompagnateur;")
+        conn.commit()
     conn.close()
 
 
