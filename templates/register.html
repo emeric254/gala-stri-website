@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Gala STRI</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.2/css/bulma.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        <div id="body" class="container">
+
+            <section class="hero">
+                <div class="hero-body">
+                    <div class="container">
+                        <h1 class="title has-text-centered">
+                            Formulaire d'inscription au gala STRI de la promo 2017
+                        </h1>
+                    </div>
+                </div>
+            </section>
+
+            <form method="post" action="/register">
+
+                {% module xsrf_form_html() %}
+
+                <section class="section">
+                    <h2 class="subtitle">
+                        Informations personnelles
+                    </h2>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Identité
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="prenom" class="input" type="text" placeholder="Prénom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="nom" class="input" type="text" placeholder="Nom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Adresse
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="courriel" class="input" type="email" placeholder="Courriel">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-envelope"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Vous êtes un
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded">
+                                    <label class="radio">
+                                        <input type="radio" name="genre" value="personnel" disabled>
+                                        membre du personnel
+                                    </label>
+                                    <label class="radio">
+                                        <input type="radio" name="genre" value="professionnel" disabled>
+                                        professionnel
+                                    </label>
+                                    <label class="radio">
+                                        <input type="radio" name="genre" value="ancien" disabled>
+                                        ancien étudiant STRI
+                                    </label>
+                                    <label class="radio">
+                                        <input type="radio" name="genre" value="etudiant" checked>
+                                        étudiant STRI
+                                    </label>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Année de promotion
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded">
+                                    <span class="select">
+                                        <select name="promotion">
+                                            <option selected value="2017">
+                                                Promo 2017 (sortante)
+                                            </option>
+                                            <option value="2018" disabled>
+                                                Promo 2018
+                                            </option>
+                                            <option value="2019" disabled>
+                                                Promo 2019
+                                            </option>
+                                            <option value="2020" disabled>
+                                                Promo 2020
+                                            </option>
+                                        </select>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2 class="subtitle">
+                        Accompagnateur(s)
+                    </h2>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Accompagnateur 1
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-prenom" class="input" type="text" placeholder="Prénom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-nom" class="input" type="text" placeholder="Nom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Accompagnateur 2
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-prenom" class="input" type="text" placeholder="Prénom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-nom" class="input" type="text" placeholder="Nom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Accompagnateur 3
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-prenom" class="input" type="text" placeholder="Prénom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-nom" class="input" type="text" placeholder="Nom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Accompagnateur 4
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-prenom" class="input" type="text" placeholder="Prénom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-nom" class="input" type="text" placeholder="Nom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Accompagnateur 5
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-prenom" class="input" type="text" placeholder="Prénom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-nom" class="input" type="text" placeholder="Nom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Accompagnateur 6
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-prenom" class="input" type="text" placeholder="Prénom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-nom" class="input" type="text" placeholder="Nom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Accompagnateur 7
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-prenom" class="input" type="text" placeholder="Prénom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-nom" class="input" type="text" placeholder="Nom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Accompagnateur 8
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-prenom" class="input" type="text" placeholder="Prénom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-nom" class="input" type="text" placeholder="Nom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Accompagnateur 9
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-prenom" class="input" type="text" placeholder="Prénom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-nom" class="input" type="text" placeholder="Nom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            Accompagnateur 10
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-prenom" class="input" type="text" placeholder="Prénom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control is-expanded has-icons-left">
+                                    <input name="accompagnateurs-nom" class="input" type="text" placeholder="Nom">
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            <!-- spacing -->
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <button class="button" disabled>
+                                        Ajouter un accompagnateur
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            <!-- spacing -->
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <button class="button is-primary">
+                                        S'inscire
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </form>
+        </div>
+    </body>
+</html>
