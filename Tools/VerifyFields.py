@@ -25,6 +25,9 @@ def verify_genre(genre: str):
     return genre in ('personnel', 'professionnel', 'ancien', 'etudiant')
 
 
-def verify_all(prenom: str, nom: str, courriel: str, genre: str, promotion):
+def verify_all(prenom: str, nom: str, courriel: str, genre: str, promotion, accompagnateurs: list):
+    for (a_prenom, a_nom) in accompagnateurs:
+        if not a_prenom or not len(a_prenom) > 0 or not a_nom or not len(a_nom) > 0:
+            return False
     return verify_identity(prenom, nom) and verify_email(courriel) \
            and verify_genre(genre) and verify_promotion(promotion)
