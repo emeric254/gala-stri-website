@@ -26,6 +26,7 @@ class RegisterHandler(BaseHandler):
         nom_accompagnateurs = self.get_body_arguments('accompagnateurs-nom')
         accompagnateurs = []
         size = len(prenom_accompagnateurs)
+        size = size if size < 11 else 10
         if size == len(nom_accompagnateurs):
             for i in range(0, size):
                 a_prenom = escape.xhtml_escape(prenom_accompagnateurs[i])
