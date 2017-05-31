@@ -35,7 +35,7 @@ def init_db():
     cur.execute("SELECT 1 FROM pg_type WHERE typname = 'personne_type'")
     result = cur.fetchone()
     if not result:
-        cur.execute("CREATE TYPE personne_type AS ENUM ('personnel', 'professionnel', 'ancien', 'etudiant');")
+        cur.execute("CREATE TYPE personne_type AS ENUM ('personnel', 'professionnel', 'ancien', 'etudiant', 'autre');")
     cur.execute("SELECT 1 FROM pg_type WHERE typname = 'status_accompagnateur'")
     result = cur.fetchone()
     if not result:
@@ -45,15 +45,16 @@ def init_db():
                 "prenom VARCHAR(64) NOT NULL,"
                 "nom VARCHAR(64) NOT NULL,"
                 "status personne_type NOT NULL,"
-                "paiement BOOL NOT NULL DEFAULT FALSE);")
+                "paiement BOOL NOT NULL DEFAULT FALSE,"
+                "UNIQUE (prenom, nom));")
     cur.execute("CREATE TABLE IF NOT EXISTS inscrits ("
                 "f_id_personne INT NOT NULL PRIMARY KEY REFERENCES personnes (id),"
                 "courriel VARCHAR(96) NOT NULL,"
                 "promo int NOT NULL);")
-    cur.execute("CREATE TABLE IF NOT EXISTS accompagnateurs ("
+    cur.execute("CREATE TABLE IF NOT EXISTS accompagnants ("
                 "f_id_personne INT NOT NULL REFERENCES personnes (id),"
                 "f_id_inscrit INT NOT NULL REFERENCES inscrits (f_id_personne),"
-                "status status_accompagnateur NOT NULL DEFAULT 'attente',"
+                "validation status_accompagnateur NOT NULL DEFAULT 'attente',"
                 "PRIMARY KEY(f_id_personne, f_id_inscrit));")
     conn.commit()
     cur.close()
@@ -63,27 +64,46 @@ def init_db():
 def reset_db():
     conn = get_session()
     cur = conn.cursor()
-    cur.execute("TRUNCATE TABLE accompagnateurs, inscrits, personnes;")
-    cur.execute("DROP TABLE accompagnateurs; DROP TABLE inscrits; DROP TABLE personnes;")
+    cur.execute("TRUNCATE TABLE accompagnants, inscrits, personnes;")
+    cur.execute("DROP TABLE accompagnants; DROP TABLE inscrits; DROP TABLE personnes;")
     cur.execute("DROP TYPE personne_type; DROP TYPE status_accompagnateur;")
     conn.commit()
     cur.close()
     conn.close()
 
 
-def insert_inscrit(prenom: str, nom: str, status: str, courriel: str, promotion: int):
+def insert_accompagnants(cur, inscrit_id: int, accompagnateurs: list):
+    for (a_prenom, a_nom) in accompagnateurs:
+        cur.execute("INSERT INTO personnes (prenom, nom, status) VALUES (%s, %s, %s);", (a_prenom, a_nom, 'autre'))
+        cur.execute("SELECT currval(pg_get_serial_sequence('personnes','id'));")
+        inserted_a_id = cur.fetchone()
+        if inserted_a_id:
+            a_status = 'valide' if accompagnateurs.index((a_prenom, a_nom)) < 3 else 'attente'
+            cur.execute("INSERT INTO accompagnants (f_id_personne, f_id_inscrit, validation) VALUES (%s, %s, %s);",
+                        (inserted_a_id[0], inscrit_id, a_status))
+        else:
+            return False
+    return True
+
+
+def insert_inscrit(prenom: str, nom: str, status: str, courriel: str, promotion: int, accompagnateurs: list):
     success = False
     conn = get_session()
     cur = conn.cursor()
-    cur.execute("INSERT INTO personnes (prenom, nom, status) VALUES (%s, %s, %s);", (prenom, nom, status))
+    try:
+        cur.execute("INSERT INTO personnes (prenom, nom, status) VALUES (%s, %s, %s);", (prenom, nom, status))
+    except psycopg2.IntegrityError as err:
+        logger.warning(str(err))
+        conn.rollback()
+        cur.close()
+        conn.close()
+        return success
     cur.execute("SELECT currval(pg_get_serial_sequence('personnes','id'));")
     inserted_id = cur.fetchone()
     if inserted_id:
         cur.execute("INSERT INTO inscrits (f_id_personne, courriel, promo) VALUES (%s, %s, %s);",
                     (inserted_id[0], courriel, promotion))
-        cur.execute("SELECT currval(pg_get_serial_sequence('inscrits','f_id_personne'));")
-        inserted_id = cur.fetchone()
-        if inserted_id:
+        if insert_accompagnants(cur, inserted_id[0], accompagnateurs):
             conn.commit()
             success = True
         else:
