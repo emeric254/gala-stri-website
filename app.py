@@ -6,6 +6,7 @@ import uuid
 import logging
 from tornado import ioloop, web
 from Handlers.MainHandler import MainHandler
+from Handlers.RegisterHandler import RegisterHandler
 from Tools import PostgreSQL
 
 logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.INFO)
@@ -20,6 +21,7 @@ class Application(web.Application):
     def __init__(self):
         handlers = [
             (r'/', MainHandler),
+            (r'/register', RegisterHandler),
         ]
         settings = {
             'cookie_secret': ''.join([str(uuid.uuid4()) for _ in range(8)]),
@@ -32,7 +34,7 @@ class Application(web.Application):
 
 
 def main():
-    # PostgreSQL.reset_db()
+    PostgreSQL.reset_db()
     PostgreSQL.init_db()
     app = Application()
     app.listen(port=app_port)
