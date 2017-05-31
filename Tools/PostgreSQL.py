@@ -63,7 +63,7 @@ def init_db():
 def reset_db():
     conn = get_session()
     cur = conn.cursor()
-    cur.execute("DELETE FROM accompagnateurs; DELETE FROM inscrits; DELETE FROM personnes;")
+    cur.execute("TRUNCATE TABLE accompagnateurs, inscrits, personnes;")
     cur.execute("DROP TABLE accompagnateurs; DROP TABLE inscrits; DROP TABLE personnes;")
     cur.execute("DROP TYPE personne_type; DROP TYPE status_accompagnateur;")
     conn.commit()
