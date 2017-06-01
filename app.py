@@ -35,7 +35,7 @@ class Application(web.Application):
 
 def main():
     # PostgreSQL.reset_db()
-    PostgreSQL.init_db()
+    # PostgreSQL.init_db()
     app = Application()
     app.listen(port=app_port)
     ioloop.IOLoop.current().start()
