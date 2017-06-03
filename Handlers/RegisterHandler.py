@@ -12,7 +12,7 @@ class RegisterHandler(BaseHandler):
     """handle / endpoint"""
 
     def get(self):
-        """Serve Get and return main page"""
+        """Serve Get and return register/form page"""
         self.render('register.html')
 
     def post(self):
@@ -35,6 +35,7 @@ class RegisterHandler(BaseHandler):
                     accompagnateurs.append((a_prenom, a_nom))
         if VerifyFields.verify_all(prenom, nom, courriel, genre, promotion, accompagnateurs):
             if PostgreSQL.insert_inscrit(prenom, nom, genre, courriel, promotion, accompagnateurs):
-                self.render('registered.html')
+                self.set_status(201)  # status 201 : created !
+                self.write({})
                 return
-        self.send_error(status_code=400)
+        self.send_error(status_code=400)  # bad request
