@@ -146,7 +146,7 @@ class Validation extends React.Component {
                     <div className="field">
                         <div className="control">
                             <div className="notification is-danger">
-                                Une erreur a été rencontrée, veuillez réessayer.
+                                Une erreur a été rencontrée, veuillez vérifier les champs du formulaire et réessayer.
                             </div>
                         </div>
                     </div>
