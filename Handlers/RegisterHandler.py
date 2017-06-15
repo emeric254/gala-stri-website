@@ -3,7 +3,7 @@
 import logging
 from tornado import escape
 from Handlers.BaseHandler import BaseHandler
-from Tools import PostgreSQL, VerifyFields
+from Tools import PostgreSQL, VerifyFields, EmailSender
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,8 @@ class RegisterHandler(BaseHandler):
                     accompagnateurs.append((a_prenom, a_nom))
         if VerifyFields.verify_all(prenom, nom, courriel, genre, promotion, accompagnateurs):
             if PostgreSQL.insert_inscrit(prenom, nom, genre, courriel, promotion, accompagnateurs):
-                self.set_status(201)  # status 201 : created !
-                self.write({})
+                EmailSender.send_simple_mail(to=courriel, subject='Confirmation Gala STRI 2017',
+                                             text='Votre inscription à bien été prise en compte.')
+                self.render('registered.html')
                 return
         self.send_error(status_code=400)  # bad request
