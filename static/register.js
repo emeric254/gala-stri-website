@@ -144,7 +144,7 @@ class Devis extends React.Component {
         console.log(sortant);
         const nb_acc = this.props.nb_acc;
         const total_acc = nb_acc * cout_acc;
-        const total = (sortant)?15:0 + total_acc;
+        const total = total_acc + ((sortant)?15:0);
         return (
             <section className="section">
                 <h2 className="subtitle">
