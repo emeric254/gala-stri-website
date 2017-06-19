@@ -36,6 +36,6 @@ class RegisterHandler(BaseHandler):
         if VerifyFields.verify_all(prenom, nom, courriel, genre, promotion, accompagnateurs):
             if PostgreSQL.insert_inscrit(prenom, nom, genre, courriel, promotion, accompagnateurs):
                 self.set_status(201)  # status 201 : created !
-                self.write({})
+                # self.write({})
                 return
         self.send_error(status_code=400)  # bad request
