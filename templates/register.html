@@ -9,7 +9,6 @@
     </head>
     <body>
         <div id="body" class="container">
-
             <section class="hero">
                 <div class="hero-body">
                     <div class="container">
@@ -19,16 +18,13 @@
                     </div>
                 </div>
             </section>
-
-            <form id="formulaire" method="post" action="/register">
-
+            <form id="formulaire">
                 {% module xsrf_form_html() %}
-
-                <section class="section" id="identite"></section>
-
-                <section class="section" id="accompagnateurs"></section>
-
-                <section class="section" id="validation"></section>
+                <div id="form_content">
+                    <div class="is-fullwidth has-text-centered">
+                        <button class="button is-loading"> </button>
+                    </div>
+                </div>
             </form>
         </div>
         <script src="https://unpkg.com/react@latest/dist/react.js"></script>
