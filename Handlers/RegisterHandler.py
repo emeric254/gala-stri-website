@@ -38,6 +38,6 @@ class RegisterHandler(BaseHandler):
                 EmailSender.send_simple_mail(to=courriel, subject='Confirmation Gala STRI 2017',
                                              text='Votre inscription à bien été prise en compte.')
                 self.set_status(201)  # status 201 : created !
-                # self.write({})
+                self.write({})
                 return
         self.send_error(status_code=400)  # bad request
