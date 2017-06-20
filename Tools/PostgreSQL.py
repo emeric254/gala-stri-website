@@ -117,3 +117,160 @@ def insert_inscrit(prenom: str, nom: str, status: str, courriel: str, promotion:
     cur.close()
     conn.close()
     return success
+
+
+def get_all_inscrit():
+    results = []
+    conn = get_session()
+    cur = conn.cursor()
+    cur.execute("SELECT p.id, p.prenom, p.nom, p.status, p.paiement, i.courriel, i.promo "
+                "FROM personnes p, inscrits i "
+                "WHERE p.id = i.f_id_personne "
+                "ORDER BY p.status, p.id DESC;")
+    results = cur.fetchall()
+    cur.close()
+    conn.close()
+    return results
+
+
+def get_all_accompagnants():
+    results = []
+    conn = get_session()
+    cur = conn.cursor()
+    cur.execute("SELECT p.id, a.f_id_personne, a.f_id_inscrit, p.prenom, p.nom, p.status, p.paiement, a.validation "
+                "FROM personnes p, accompagnants a "
+                "WHERE p.id = a.f_id_personne "
+                "ORDER BY a.validation, p.status, p.id DESC;")
+    results = cur.fetchall()
+    cur.close()
+    conn.close()
+    return results
+
+
+def get_all_accompagnants_inscrit(id_inscrit):
+    results = []
+    conn = get_session()
+    cur = conn.cursor()
+    cur.execute("SELECT p.id, a.f_id_personne, a.f_id_inscrit, p.prenom, p.nom, p.status, p.paiement, a.validation "
+                "FROM personnes p, accompagnants a "
+                "WHERE p.id = a.f_id_personne AND a.f_id_inscrit = (%s) "
+                "ORDER BY a.validation, p.status, p.id DESC;", (id_inscrit,))
+    results = cur.fetchall()
+    cur.close()
+    conn.close()
+    return results
+
+
+def accepter_paiement(id_personne):
+    conn = get_session()
+    cur = conn.cursor()
+    try:
+        cur.execute("UPDATE personnes SET paiement = True WHERE id = (%s);", (id_personne,))
+    except psycopg2.DataError as err:
+        logger.warning(str(err))
+        conn.rollback()
+        return False
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
+
+def refuser_paiement(id_personne):
+    conn = get_session()
+    cur = conn.cursor()
+    try:
+        cur.execute("UPDATE personnes SET paiement = False WHERE id = (%s);", (id_personne,))
+    except psycopg2.DataError as err:
+        logger.warning(str(err))
+        conn.rollback()
+        return False
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
+
+def valider_accompagnant(id_personne):
+    conn = get_session()
+    cur = conn.cursor()
+    try:
+        cur.execute("UPDATE accompagnants SET validation = 'valide' WHERE f_id_personne = (%s);", (id_personne,))
+    except psycopg2.DataError as err:
+        logger.warning(str(err))
+        conn.rollback()
+        return False
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
+
+def refuser_accompagnant(id_personne):
+    conn = get_session()
+    cur = conn.cursor()
+    try:
+        cur.execute("UPDATE accompagnants SET validation = 'refus' WHERE f_id_personne = (%s);", (id_personne,))
+    except psycopg2.DataError as err:
+        logger.warning(str(err))
+        conn.rollback()
+        return False
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
+
+def attente_accompagnant(id_personne):
+    conn = get_session()
+    cur = conn.cursor()
+    try:
+        cur.execute("UPDATE accompagnants SET validation = 'attente' WHERE f_id_personne = (%s);", (id_personne,))
+    except psycopg2.DataError as err:
+        logger.warning(str(err))
+        conn.rollback()
+        return False
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
+
+def supprimer_inscrit(id_personne):
+    conn = get_session()
+    cur = conn.cursor()
+    try:
+        cur.execute("DELETE FROM accompagnants WHERE f_id_inscrit = (%s);", (id_personne,))
+        cur.execute("DELETE FROM inscrits WHERE f_id_personne = (%s);", (id_personne,))
+        cur.execute("DELETE FROM personnes WHERE id = (%s);", (id_personne,))
+    except psycopg2.IntegrityError as err:
+        logger.warning(str(err))
+        conn.rollback()
+        return False
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
+
+def supprimer_acconpagnant(id_personne):
+    conn = get_session()
+    cur = conn.cursor()
+    try:
+        cur.execute("DELETE FROM accompagnants WHERE f_id_personne = (%s);", (id_personne,))
+        cur.execute("DELETE FROM personnes WHERE id = (%s);", (id_personne,))
+    except psycopg2.IntegrityError as err:
+        logger.warning(str(err))
+        conn.rollback()
+        return False
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
+
+print(get_all_inscrit())
+print(get_all_accompagnants())
+print(get_all_accompagnants_inscrit(19))
+accepter_paiement(14)
+refuser_accompagnant(20)

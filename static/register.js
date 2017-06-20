@@ -1,6 +1,6 @@
 'use strict';
 
-const cout_sortant = 15;
+const cout_sortant = 50;
 const cout_acc = 15;
 
 class Accompagnant extends React.Component {
@@ -144,7 +144,7 @@ class Devis extends React.Component {
         console.log(sortant);
         const nb_acc = this.props.nb_acc;
         const total_acc = nb_acc * cout_acc;
-        const total = total_acc + ((sortant)?15:0);
+        const total = total_acc + ((sortant)?cout_sortant:0);
         return (
             <section className="section">
                 <h2 className="subtitle">

@@ -11,6 +11,9 @@ from Handlers.RegisteredHandler import RegisteredHandler
 from Handlers.LoginHandler import LoginHandler
 from Handlers.LogoutHandler import LogoutHandler
 from Handlers.AdminHandler import AdminHandler
+from Handlers.ListingHandler import ListingHandler
+from Handlers.PaiementHandler import PaiementHandler
+from Handlers.ValidationHandler import ValidationHandler
 # from Tools import PostgreSQL
 
 logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.INFO)
@@ -30,6 +33,9 @@ class Application(web.Application):
             (r'/login', LoginHandler),
             (r'/logout', LogoutHandler),
             (r'/admin', AdminHandler),
+            (r'/liste/(.+)$', ListingHandler),
+            (r'/paiement/(.+)$', PaiementHandler),
+            (r'/validation/(.+)$', ValidationHandler),
         ]
         settings = {
             'cookie_secret': ''.join([str(uuid.uuid4()) for _ in range(16)]),
