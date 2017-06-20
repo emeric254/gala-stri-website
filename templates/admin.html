@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Admin login</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="{{ static_url('css/bulma.min.css') }}">
+        <link rel="stylesheet" href="{{ static_url('css/font-awesome.min.css') }}">
+    </head>
+    <body>
+        <section>
+            <header class="nav has-shadow">
+                <div class="container">
+                    <div class="nav-left">
+                        <a class="nav-item is-active" href="/">
+                            <span class="icon">
+                                <i class="fa fa-tachometer"></i>
+                            </span>
+                            <span>Admin login</span>
+                        </a>
+                    </div>
+                    <div class="nav-right nav-menu">
+                        <a href="/logout" class="nav-item is-tab">
+                            <span class="icon">
+                                <i class="fa fa-sign-out"></i>
+                            </span>
+                            <span>
+                                Log out
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </header>
+        </section>
+        <section id="content" style="padding-top: 16px">
+            <div class="is-fullwidth has-text-centered">
+                <button class="button is-primary is-loading" disabled ></button>
+            </div>
+        </section>
+    </body>
+</html>

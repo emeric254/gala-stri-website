@@ -8,6 +8,9 @@ from tornado import ioloop, web
 from Handlers.MainHandler import MainHandler
 from Handlers.RegisterHandler import RegisterHandler
 from Handlers.RegisteredHandler import RegisteredHandler
+from Handlers.LoginHandler import LoginHandler
+from Handlers.LogoutHandler import LogoutHandler
+from Handlers.AdminHandler import AdminHandler
 # from Tools import PostgreSQL
 
 logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.INFO)
@@ -24,9 +27,12 @@ class Application(web.Application):
             (r'/', MainHandler),
             (r'/register', RegisterHandler),
             (r'/registered', RegisteredHandler),
+            (r'/login', LoginHandler),
+            (r'/logout', LogoutHandler),
+            (r'/admin', AdminHandler),
         ]
         settings = {
-            'cookie_secret': ''.join([str(uuid.uuid4()) for _ in range(8)]),
+            'cookie_secret': ''.join([str(uuid.uuid4()) for _ in range(16)]),
             'template_path': './templates',
             'static_path': './static',
             'login_url': '/login',

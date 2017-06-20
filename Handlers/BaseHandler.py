@@ -15,3 +15,11 @@ class BaseHandler(RequestHandler):
         :return: current connected user
         """
         return self.get_secure_cookie('user')
+
+    def is_connected(self):
+        """True if the user is connected"""
+        return self.get_current_user() and len(self.get_current_user()) > 1
+
+    def is_blocked(self):
+        """Send 403 to a blocked ip"""
+        pass  # TODO add ban
