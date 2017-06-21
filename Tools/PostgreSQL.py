@@ -267,10 +267,3 @@ def supprimer_acconpagnant(id_personne):
     cur.close()
     conn.close()
     return True
-
-
-print(get_all_inscrit())
-print(get_all_accompagnants())
-print(get_all_accompagnants_inscrit(19))
-accepter_paiement(14)
-refuser_accompagnant(20)
