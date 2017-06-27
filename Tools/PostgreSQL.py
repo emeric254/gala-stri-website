@@ -35,7 +35,8 @@ def init_db():
             cur.execute("SELECT 1 FROM pg_type WHERE typname = 'personne_type'")
             result = cur.fetchone()
             if not result:
-                cur.execute("CREATE TYPE personne_type AS ENUM ('personnel', 'professionnel', 'ancien', 'etudiant', 'autre');")
+                cur.execute("CREATE TYPE personne_type AS ENUM "
+                            "('personnel', 'professionnel', 'ancien', 'etudiant', 'autre');")
             cur.execute("SELECT 1 FROM pg_type WHERE typname = 'status_accompagnateur'")
             result = cur.fetchone()
             if not result:
@@ -124,7 +125,8 @@ def get_all_inscrit():
 def get_all_accompagnants():
     with get_session() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT p.id, a.f_id_personne, a.f_id_inscrit, p.prenom, p.nom, p.status, p.paiement, a.validation "
+            cur.execute("SELECT p.id, a.f_id_personne, a.f_id_inscrit, "
+                        "p.prenom, p.nom, p.status, p.paiement, a.validation "
                         "FROM personnes p, accompagnants a "
                         "WHERE p.id = a.f_id_personne "
                         "ORDER BY a.validation, p.status, p.id DESC;")
@@ -135,7 +137,8 @@ def get_all_accompagnants():
 def get_all_accompagnants_inscrit(id_inscrit):
     with get_session() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT p.id, a.f_id_personne, a.f_id_inscrit, p.prenom, p.nom, p.status, p.paiement, a.validation "
+            cur.execute("SELECT p.id, a.f_id_personne, a.f_id_inscrit, "
+                        "p.prenom, p.nom, p.status, p.paiement, a.validation "
                         "FROM personnes p, accompagnants a "
                         "WHERE p.id = a.f_id_personne AND a.f_id_inscrit = (%s) "
                         "ORDER BY a.validation, p.status, p.id DESC;", (id_inscrit,))
@@ -171,7 +174,8 @@ def valider_accompagnant(id_personne):
     with get_session() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("UPDATE accompagnants SET validation = 'valide' WHERE f_id_personne = (%s);", (id_personne,))
+                cur.execute("UPDATE accompagnants SET validation = 'valide' "
+                            "WHERE f_id_personne = (%s);", (id_personne,))
             except psycopg2.DataError as err:
                 logger.warning(str(err))
                 conn.rollback()
@@ -195,7 +199,8 @@ def attente_accompagnant(id_personne):
     with get_session() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("UPDATE accompagnants SET validation = 'attente' WHERE f_id_personne = (%s);", (id_personne,))
+                cur.execute("UPDATE accompagnants SET validation = 'attente' "
+                            "WHERE f_id_personne = (%s);", (id_personne,))
             except psycopg2.DataError as err:
                 logger.warning(str(err))
                 conn.rollback()
