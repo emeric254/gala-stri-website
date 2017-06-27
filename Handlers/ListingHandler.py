@@ -21,7 +21,7 @@ class ListingHandler(BaseHandler):
             self.write(json.dumps(PostgreSQL.get_all_accompagnants()))
             return
         elif path_request.startswith('inscrits') and '/' in path_request:
-            (_, id) = path_request.rsplit('/',1)
+            (_, id) = path_request.rsplit('/', 1)
             try:
                 id = int(id)
                 if id < 0:
@@ -30,5 +30,17 @@ class ListingHandler(BaseHandler):
                 self.send_error(status_code=400)
                 return
             self.write(json.dumps(PostgreSQL.get_all_accompagnants_inscrit(id)))
+            return
+        self.send_error(status_code=400)
+
+    @authenticated
+    def delete(self, path_request):
+        if path_request.startswith('inscrits/'):
+            PostgreSQL.supprimer_inscrit(path_request[9:])
+            self.write({})
+            return
+        elif path_request.startswith('accompagnants/'):
+            PostgreSQL.supprimer_acconpagnant(path_request[14:])
+            self.write({})
             return
         self.send_error(status_code=400)

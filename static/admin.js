@@ -1,14 +1,43 @@
 
 class Inscrit extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            id_personne : this.props.data[0],
+            nom : this.props.data[1],
+            prenom : this.props.data[2],
+            type : this.props.data[3],
+            paiement : this.props.data[4],
+            courriel : this.props.data[5],
+            promo : this.props.data[6]
+        };
+        this.togglePay = this.togglePay.bind(this);
+    }
+
+    togglePay () {
+        fetch("/paiement/" + this.state.id_personne, {
+                method: (this.state.paiement ? "DELETE" : "POST"),
+                credentials: "same-origin",
+                headers: {
+                    "X-XSRFTOKEN": document.cookie.match("\\b" + name + "=([^;]*)\\b")[1]
+                }
+        }).then(response => response.json()).then(json => {
+            this.setState(function(prevState) {
+                return {
+                    paiement: ! prevState.paiement
+                };
+            });
+        });
+    }
+
     render () {
-        const data = this.props.data;
-        const id_personne = data[0];
-        const nom = data[1];
-        const prenom = data[2];
-        const type = data[3];
-        const paiement = data[4];
-        const courriel = data[5];
-        const promo = data[6];
+        const id_personne = this.state.id_personne;
+        const nom = this.state.nom;
+        const prenom = this.state.prenom;
+        const type = this.state.type;
+        const paiement = this.state.paiement;
+        const courriel = this.state.courriel;
+        const promo = this.state.promo;
         return (
             <div className="card">
                 <div className="card-content">
@@ -29,8 +58,8 @@ class Inscrit extends React.Component {
                 </div>
                 <footer className="card-footer">
                     <a className="card-footer-item" href={"mailto:" + courriel}>Contacter par mail</a>
-                    <a className="card-footer-item">Basculer paiement</a>
-                    <a className="card-footer-item">Supprimer cette personne</a>
+                    <a className="card-footer-item" onClick={this.togglePay}>Basculer paiement</a>
+                    <a className="card-footer-item" onClick={this.props.deleteInscrit}>Supprimer cette personne</a>
                 </footer>
             </div>
         )
@@ -78,11 +107,28 @@ class ListeInscrits extends React.Component {
         this.loadInscrits();
     }
 
+    deleteInscrit (deleted_id_personne) {
+        fetch("/liste/inscrits/" + deleted_id_personne, {
+                method: "DELETE",
+                credentials: "same-origin",
+                headers: {
+                    "X-XSRFTOKEN": document.cookie.match("\\b" + name + "=([^;]*)\\b")[1]
+                }
+        }).then(response => response.json()).then(json => {
+            this.setState(function(prevState) {
+                return {
+                    liste: prevState.liste.filter(function (el) { return el[0] != deleted_id_personne })
+                };
+            });
+        });
+    }
+
     render () {
         const liste = this.state.liste;
-        const inscrits = liste.map((inscrit) =>
-            <Inscrit key={inscrit[0]} data={inscrit} />
-        );
+        const inscrits = liste.map((inscrit) => {
+            let deleteInscrit = this.deleteInscrit.bind(this, inscrit[0]);
+            return <Inscrit key={inscrit[0]} data={inscrit} deleteInscrit={deleteInscrit} />
+        });
         return (
             <div>
                 {inscrits}
