@@ -30,4 +30,4 @@ def verify_all(prenom: str, nom: str, courriel: str, genre: str, promotion, acco
         if not a_prenom or not len(a_prenom) > 0 or not a_nom or not len(a_nom) > 0:
             return False
     return verify_identity(prenom, nom) and verify_email(courriel) \
-           and verify_genre(genre) and verify_promotion(promotion)
+           and verify_genre(genre) and (verify_promotion(promotion) or genre != 'etudiant')

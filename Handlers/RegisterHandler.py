@@ -21,9 +21,10 @@ class RegisterHandler(BaseHandler):
         nom = escape.xhtml_escape(self.get_body_argument('nom'))[:64]
         courriel = escape.xhtml_escape(self.get_body_argument('courriel'))[:96]
         genre = escape.xhtml_escape(self.get_body_argument('genre'))[:16]
-        promotion = int(escape.xhtml_escape(self.get_body_argument('promotion'))[:4])
+        promotion = int(escape.xhtml_escape(self.get_body_argument('promotion', default='0'))[:4])
         prenom_accompagnateurs = self.get_body_arguments('accompagnateurs-prenom')
         nom_accompagnateurs = self.get_body_arguments('accompagnateurs-nom')
+        print(prenom, nom, courriel, genre, promotion, prenom_accompagnateurs, nom_accompagnateurs)
         accompagnateurs = []
         size = len(prenom_accompagnateurs)
         size = size if size < 11 else 10

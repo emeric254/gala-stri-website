@@ -92,7 +92,13 @@ class Validation extends React.Component {
         var form_data =  new FormData();
         var formulaire = document.getElementById("formulaire").elements;
         for (var i = 0, iLen = formulaire.length; i < iLen; i++) {
-            form_data.append(formulaire[i].name, formulaire[i].value);
+            if (formulaire[i].name === 'genre') {
+                if (formulaire[i].checked) {
+                    form_data.append(formulaire[i].name, formulaire[i].value);
+                }
+            } else {
+                form_data.append(formulaire[i].name, formulaire[i].value);
+            }
         }
         const courriel = document.getElementById("courriel").value
 
@@ -141,7 +147,6 @@ class Validation extends React.Component {
 class Devis extends React.Component {
     render() {
         const sortant = this.props.sortant;
-        console.log(sortant);
         const nb_acc = this.props.nb_acc;
         const total_acc = nb_acc * cout_acc;
         const total = total_acc + ((sortant)?cout_sortant:0);
@@ -226,6 +231,9 @@ class Inscription extends React.Component {
     }
     handleTypeChange (changeEvent) {
         this.setState({selected_type: changeEvent.target.value });
+        if (changeEvent.target.value !== 'etudiant') {
+            this.setState({selected_year: ''});
+        }
     }
     handleYearChange (changeEvent) {
         this.setState({selected_year: changeEvent.target.value });

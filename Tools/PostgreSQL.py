@@ -30,46 +30,42 @@ def get_session():
 
 
 def init_db():
-    conn = get_session()
-    with conn.cursor() as cur:
-        cur.execute("SELECT 1 FROM pg_type WHERE typname = 'personne_type'")
-        result = cur.fetchone()
-        if not result:
-            cur.execute("CREATE TYPE personne_type AS ENUM ('personnel', 'professionnel', 'ancien', 'etudiant', 'autre');")
-        cur.execute("SELECT 1 FROM pg_type WHERE typname = 'status_accompagnateur'")
-        result = cur.fetchone()
-        if not result:
-            cur.execute("CREATE TYPE status_accompagnateur AS ENUM ('attente', 'refus', 'valide');")
-        cur.execute("CREATE TABLE IF NOT EXISTS personnes ("
-                    "id SERIAL PRIMARY KEY,"
-                    "prenom VARCHAR(64) NOT NULL,"
-                    "nom VARCHAR(64) NOT NULL,"
-                    "status personne_type NOT NULL,"
-                    "paiement BOOL NOT NULL DEFAULT FALSE,"
-                    "UNIQUE (prenom, nom));")
-        cur.execute("CREATE TABLE IF NOT EXISTS inscrits ("
-                    "f_id_personne INT NOT NULL PRIMARY KEY REFERENCES personnes (id),"
-                    "courriel VARCHAR(96) NOT NULL,"
-                    "promo int NOT NULL);")
-        cur.execute("CREATE TABLE IF NOT EXISTS accompagnants ("
-                    "f_id_personne INT NOT NULL REFERENCES personnes (id),"
-                    "f_id_inscrit INT NOT NULL REFERENCES inscrits (f_id_personne),"
-                    "validation status_accompagnateur NOT NULL DEFAULT 'attente',"
-                    "PRIMARY KEY(f_id_personne, f_id_inscrit));")
-        conn.commit()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT 1 FROM pg_type WHERE typname = 'personne_type'")
+            result = cur.fetchone()
+            if not result:
+                cur.execute("CREATE TYPE personne_type AS ENUM ('personnel', 'professionnel', 'ancien', 'etudiant', 'autre');")
+            cur.execute("SELECT 1 FROM pg_type WHERE typname = 'status_accompagnateur'")
+            result = cur.fetchone()
+            if not result:
+                cur.execute("CREATE TYPE status_accompagnateur AS ENUM ('attente', 'refus', 'valide');")
+            cur.execute("CREATE TABLE IF NOT EXISTS personnes ("
+                        "id SERIAL PRIMARY KEY,"
+                        "prenom VARCHAR(64) NOT NULL,"
+                        "nom VARCHAR(64) NOT NULL,"
+                        "status personne_type NOT NULL,"
+                        "paiement BOOL NOT NULL DEFAULT FALSE,"
+                        "UNIQUE (prenom, nom));")
+            cur.execute("CREATE TABLE IF NOT EXISTS inscrits ("
+                        "f_id_personne INT NOT NULL PRIMARY KEY REFERENCES personnes (id),"
+                        "courriel VARCHAR(96) NOT NULL,"
+                        "promo int NOT NULL);")
+            cur.execute("CREATE TABLE IF NOT EXISTS accompagnants ("
+                        "f_id_personne INT NOT NULL REFERENCES personnes (id),"
+                        "f_id_inscrit INT NOT NULL REFERENCES inscrits (f_id_personne),"
+                        "validation status_accompagnateur NOT NULL DEFAULT 'attente',"
+                        "PRIMARY KEY(f_id_personne, f_id_inscrit));")
 
 
 def reset_db():
-    conn = get_session()
-    with conn.cursor() as cur:
-        cur.execute("DROP TABLE IF EXISTS accompagnants;"
-                    "DROP TABLE IF EXISTS inscrits;"
-                    "DROP TABLE IF EXISTS personnes;")
-        cur.execute("DROP TYPE IF EXISTS personne_type;"
-                    "DROP TYPE IF EXISTS status_accompagnateur;")
-        conn.commit()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DROP TABLE IF EXISTS accompagnants;"
+                        "DROP TABLE IF EXISTS inscrits;"
+                        "DROP TABLE IF EXISTS personnes;")
+            cur.execute("DROP TYPE IF EXISTS personne_type;"
+                        "DROP TYPE IF EXISTS status_accompagnateur;")
 
 
 def insert_accompagnants(cur, inscrit_id: int, accompagnateurs: list):
@@ -92,185 +88,143 @@ def insert_accompagnants(cur, inscrit_id: int, accompagnateurs: list):
 
 def insert_inscrit(prenom: str, nom: str, status: str, courriel: str, promotion: int, accompagnateurs: list):
     success = False
-    conn = get_session()
-    cur = conn.cursor()
-    try:
-        cur.execute("INSERT INTO personnes (prenom, nom, status) VALUES (%s, %s, %s);", (prenom, nom, status))
-    except psycopg2.IntegrityError as err:
-        logger.warning(str(err))
-        conn.rollback()
-        cur.close()
-        conn.close()
-        return success
-    cur.execute("SELECT currval(pg_get_serial_sequence('personnes','id'));")
-    inserted_id = cur.fetchone()
-    if inserted_id:
-        cur.execute("INSERT INTO inscrits (f_id_personne, courriel, promo) VALUES (%s, %s, %s);",
-                    (inserted_id[0], courriel, promotion))
-        if insert_accompagnants(cur, inserted_id[0], accompagnateurs):
-            conn.commit()
-            success = True
-        else:
-            conn.rollback()
-    else:
-        conn.rollback()
-    cur.close()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("INSERT INTO personnes (prenom, nom, status) VALUES (%s, %s, %s);", (prenom, nom, status))
+            except psycopg2.IntegrityError as err:
+                logger.warning(str(err))
+                conn.rollback()
+                return success
+            cur.execute("SELECT currval(pg_get_serial_sequence('personnes','id'));")
+            inserted_id = cur.fetchone()
+            if inserted_id:
+                cur.execute("INSERT INTO inscrits (f_id_personne, courriel, promo) VALUES (%s, %s, %s);",
+                            (inserted_id[0], courriel, promotion))
+                if insert_accompagnants(cur, inserted_id[0], accompagnateurs):
+                    success = True
+                else:
+                    conn.rollback()
+            else:
+                conn.rollback()
     return success
 
 
 def get_all_inscrit():
-    results = []
-    conn = get_session()
-    cur = conn.cursor()
-    cur.execute("SELECT p.id, p.prenom, p.nom, p.status, p.paiement, i.courriel, i.promo "
-                "FROM personnes p, inscrits i "
-                "WHERE p.id = i.f_id_personne "
-                "ORDER BY p.status, p.id DESC;")
-    results = cur.fetchall()
-    cur.close()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT p.id, p.prenom, p.nom, p.status, p.paiement, i.courriel, i.promo "
+                        "FROM personnes p, inscrits i "
+                        "WHERE p.id = i.f_id_personne "
+                        "ORDER BY p.status, p.id DESC;")
+            results = cur.fetchall()
     return results
 
 
 def get_all_accompagnants():
-    results = []
-    conn = get_session()
-    cur = conn.cursor()
-    cur.execute("SELECT p.id, a.f_id_personne, a.f_id_inscrit, p.prenom, p.nom, p.status, p.paiement, a.validation "
-                "FROM personnes p, accompagnants a "
-                "WHERE p.id = a.f_id_personne "
-                "ORDER BY a.validation, p.status, p.id DESC;")
-    results = cur.fetchall()
-    cur.close()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT p.id, a.f_id_personne, a.f_id_inscrit, p.prenom, p.nom, p.status, p.paiement, a.validation "
+                        "FROM personnes p, accompagnants a "
+                        "WHERE p.id = a.f_id_personne "
+                        "ORDER BY a.validation, p.status, p.id DESC;")
+            results = cur.fetchall()
     return results
 
 
 def get_all_accompagnants_inscrit(id_inscrit):
-    results = []
-    conn = get_session()
-    cur = conn.cursor()
-    cur.execute("SELECT p.id, a.f_id_personne, a.f_id_inscrit, p.prenom, p.nom, p.status, p.paiement, a.validation "
-                "FROM personnes p, accompagnants a "
-                "WHERE p.id = a.f_id_personne AND a.f_id_inscrit = (%s) "
-                "ORDER BY a.validation, p.status, p.id DESC;", (id_inscrit,))
-    results = cur.fetchall()
-    cur.close()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT p.id, a.f_id_personne, a.f_id_inscrit, p.prenom, p.nom, p.status, p.paiement, a.validation "
+                        "FROM personnes p, accompagnants a "
+                        "WHERE p.id = a.f_id_personne AND a.f_id_inscrit = (%s) "
+                        "ORDER BY a.validation, p.status, p.id DESC;", (id_inscrit,))
+            results = cur.fetchall()
     return results
 
 
 def accepter_paiement(id_personne):
-    conn = get_session()
-    cur = conn.cursor()
-    try:
-        cur.execute("UPDATE personnes SET paiement = True WHERE id = (%s);", (id_personne,))
-    except psycopg2.DataError as err:
-        logger.warning(str(err))
-        conn.rollback()
-        return False
-    conn.commit()
-    cur.close()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("UPDATE personnes SET paiement = True WHERE id = (%s);", (id_personne,))
+            except psycopg2.DataError as err:
+                logger.warning(str(err))
+                conn.rollback()
+                return False
     return True
 
 
 def refuser_paiement(id_personne):
-    conn = get_session()
-    cur = conn.cursor()
-    try:
-        cur.execute("UPDATE personnes SET paiement = False WHERE id = (%s);", (id_personne,))
-    except psycopg2.DataError as err:
-        logger.warning(str(err))
-        conn.rollback()
-        return False
-    conn.commit()
-    cur.close()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("UPDATE personnes SET paiement = False WHERE id = (%s);", (id_personne,))
+            except psycopg2.DataError as err:
+                logger.warning(str(err))
+                conn.rollback()
+                return False
     return True
 
 
 def valider_accompagnant(id_personne):
-    conn = get_session()
-    cur = conn.cursor()
-    try:
-        cur.execute("UPDATE accompagnants SET validation = 'valide' WHERE f_id_personne = (%s);", (id_personne,))
-    except psycopg2.DataError as err:
-        logger.warning(str(err))
-        conn.rollback()
-        return False
-    conn.commit()
-    cur.close()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("UPDATE accompagnants SET validation = 'valide' WHERE f_id_personne = (%s);", (id_personne,))
+            except psycopg2.DataError as err:
+                logger.warning(str(err))
+                conn.rollback()
+                return False
     return True
 
 
 def refuser_accompagnant(id_personne):
-    conn = get_session()
-    cur = conn.cursor()
-    try:
-        cur.execute("UPDATE accompagnants SET validation = 'refus' WHERE f_id_personne = (%s);", (id_personne,))
-    except psycopg2.DataError as err:
-        logger.warning(str(err))
-        conn.rollback()
-        return False
-    conn.commit()
-    cur.close()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("UPDATE accompagnants SET validation = 'refus' WHERE f_id_personne = (%s);", (id_personne,))
+            except psycopg2.DataError as err:
+                logger.warning(str(err))
+                conn.rollback()
+                return False
     return True
 
 
 def attente_accompagnant(id_personne):
-    conn = get_session()
-    cur = conn.cursor()
-    try:
-        cur.execute("UPDATE accompagnants SET validation = 'attente' WHERE f_id_personne = (%s);", (id_personne,))
-    except psycopg2.DataError as err:
-        logger.warning(str(err))
-        conn.rollback()
-        return False
-    conn.commit()
-    cur.close()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("UPDATE accompagnants SET validation = 'attente' WHERE f_id_personne = (%s);", (id_personne,))
+            except psycopg2.DataError as err:
+                logger.warning(str(err))
+                conn.rollback()
+                return False
     return True
 
 
 def supprimer_inscrit(id_personne):
-    conn = get_session()
-    cur = conn.cursor()
-    try:
-        cur.execute("DELETE FROM accompagnants WHERE f_id_inscrit = (%s);", (id_personne,))
-        cur.execute("DELETE FROM inscrits WHERE f_id_personne = (%s);", (id_personne,))
-        cur.execute("DELETE FROM personnes WHERE id = (%s);", (id_personne,))
-    except psycopg2.IntegrityError as err:
-        logger.warning(str(err))
-        conn.rollback()
-        return False
-    conn.commit()
-    cur.close()
-    conn.close()
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("DELETE FROM accompagnants WHERE f_id_inscrit = (%s);", (id_personne,))
+                cur.execute("DELETE FROM inscrits WHERE f_id_personne = (%s);", (id_personne,))
+                cur.execute("DELETE FROM personnes WHERE id = (%s);", (id_personne,))
+            except psycopg2.IntegrityError as err:
+                logger.warning(str(err))
+                conn.rollback()
+                return False
     return True
 
 
 def supprimer_acconpagnant(id_personne):
-    conn = get_session()
-    cur = conn.cursor()
-    try:
-        cur.execute("DELETE FROM accompagnants WHERE f_id_personne = (%s);", (id_personne,))
-        cur.execute("DELETE FROM personnes WHERE id = (%s);", (id_personne,))
-    except psycopg2.IntegrityError as err:
-        logger.warning(str(err))
-        conn.rollback()
-        return False
-    conn.commit()
-    cur.close()
-    conn.close()
-    return True
-
-
-print(get_all_inscrit())
-print(get_all_accompagnants())
-print(get_all_accompagnants_inscrit(19))
-accepter_paiement(14)
-refuser_accompagnant(20)
+    with get_session() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("DELETE FROM accompagnants WHERE f_id_personne = (%s);", (id_personne,))
+                cur.execute("DELETE FROM personnes WHERE id = (%s);", (id_personne,))
+            except psycopg2.IntegrityError as err:
+                logger.warning(str(err))
+                conn.rollback()
+                return False
+        return True
