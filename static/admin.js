@@ -91,7 +91,8 @@ class ListeInscrits extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            liste : []
+            liste : [],
+            filter: this.props.filter
         };
     }
 
@@ -126,6 +127,9 @@ class ListeInscrits extends React.Component {
     render () {
         const liste = this.state.liste;
         const inscrits = liste.map((inscrit) => {
+            if (this.state.filter && inscrit[4]) {
+                return
+            }
             let deleteInscrit = this.deleteInscrit.bind(this, inscrit[0]);
             return <Inscrit key={inscrit[0]} data={inscrit} deleteInscrit={deleteInscrit} />
         });
@@ -135,7 +139,6 @@ class ListeInscrits extends React.Component {
             </div>
         )
     }
-
 }
 
 class TabMenu extends React.Component {
@@ -146,18 +149,25 @@ class TabMenu extends React.Component {
             showListe : 1
         };
         this.showListeInscrits = this.showListeInscrits.bind(this);
+        this.showListeInscritsNonPaye = this.showListeInscritsNonPaye.bind(this);
+        this.showListeValidation = this.showListeValidation.bind(this);
+        this.showListePaiement = this.showListePaiement.bind(this);
     }
 
     showListeInscrits () {
         this.setState({showListe: 1});
     }
 
-    showListeValidation () {
+    showListeInscritsNonPaye () {
         this.setState({showListe: 2});
     }
 
-    showListePaiement () {
+    showListeValidation () {
         this.setState({showListe: 3});
+    }
+
+    showListePaiement () {
+        this.setState({showListe: 4});
     }
 
     render () {
@@ -166,33 +176,44 @@ class TabMenu extends React.Component {
                 <div className="tabs is-fullwidth">
                     <ul>
                         <li className={this.state.showListe === 1 && "is-active"} >
-                            <a onClick={this.loadInscrits} >
+                            <a onClick={this.showListeInscrits} >
                                 <span className="icon">
                                     <i className="fa fa-users"></i>
                                 </span>
                                 <span>Liste Inscrits</span>
                             </a>
                         </li>
-                        <li>
-                            <a>
-                                <span className="icon">
-                                    <i className="fa fa-user-o"></i>
-                                </span>
-                                <span>Validation en attente</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
+                        <li className={this.state.showListe === 2 && "is-active"} >
+                            <a onClick={this.showListeInscritsNonPaye} >
                                 <span className="icon">
                                     <i className="fa fa-user-secret"></i>
                                 </span>
-                                <span>Paiement en attente</span>
+                                <span>Inscrits a payer</span>
+                            </a>
+                        </li>
+                        <li className={this.state.showListe === 3 && "is-active"} >
+                            <a onClick={this.showListeValidation} >
+                                <span className="icon">
+                                    <i className="fa fa-user-o"></i>
+                                </span>
+                                <span>Accompagnants a valider</span>
+                            </a>
+                        </li>
+                        <li className={this.state.showListe === 4 && "is-active"} >
+                            <a onClick={this.showListePaiement} >
+                                <span className="icon">
+                                    <i className="fa fa-user-secret"></i>
+                                </span>
+                                <span>Accompagnants a payer</span>
                             </a>
                         </li>
                     </ul>
                 </div>
                 { this.state.showListe === 1 &&
-                    <ListeInscrits />
+                    <ListeInscrits filter={false}/>
+                }
+                { this.state.showListe === 2 &&
+                    <ListeInscrits filter={true}/>
                 }
             </div>
         )
