@@ -40,7 +40,7 @@ class ListingHandler(BaseHandler):
             self.write({})
             return
         elif path_request.startswith('accompagnants/'):
-            PostgreSQL.supprimer_acconpagnant(path_request[14:])
+            PostgreSQL.supprimer_accompagnant(path_request[14:])
             self.write({})
             return
         self.send_error(status_code=400)

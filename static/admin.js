@@ -154,7 +154,7 @@ class Accompagnant extends React.Component {
 
     toggleValide () {
         fetch("/validation/" + this.state.id_personne, {
-                method: (this.state.paiement ? "DELETE" : "POST"),
+                method: (this.state.validation ? "DELETE" : "POST"),
                 credentials: "same-origin",
                 headers: {
                     "X-XSRFTOKEN": document.cookie.match("\\b" + name + "=([^;]*)\\b")[1]
@@ -207,7 +207,7 @@ class Accompagnant extends React.Component {
                 <footer className="card-footer">
                     <a className="card-footer-item" onClick={this.togglePay}>Basculer paiement</a>
                     <a className="card-footer-item" onClick={this.toggleValide}>Basculer validation</a>
-                    <a className="card-footer-item" onClick={this.props.deleteInscrit}>Supprimer cette personne</a>
+                    <a className="card-footer-item" onClick={this.props.deleteAccompagnant}>Supprimer cette personne</a>
                 </footer>
             </div>
         )
@@ -238,7 +238,7 @@ class ListeAccompagnants extends React.Component {
     }
 
     deleteAccompagnant (deleted_id_personne) {
-        fetch("/liste/inscrits/" + deleted_id_personne, {
+        fetch("/liste/accompagnants/" + deleted_id_personne, {
                 method: "DELETE",
                 credentials: "same-origin",
                 headers: {

@@ -222,7 +222,7 @@ def supprimer_inscrit(id_personne):
     return True
 
 
-def supprimer_acconpagnant(id_personne):
+def supprimer_accompagnant(id_personne):
     with get_session() as conn:
         with conn.cursor() as cur:
             try:
