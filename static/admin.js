@@ -126,7 +126,7 @@ class Accompagnant extends React.Component {
         super(props);
         this.state = {
             id_personne : this.props.data[0],
-            id_inscrit : this.props.data[1],
+            nom_inscrit : this.props.data[1],
             prenom : this.props.data[2],
             nom : this.props.data[3],
             paiement : this.props.data[5],
@@ -170,7 +170,7 @@ class Accompagnant extends React.Component {
 
     render () {
         const id_personne = this.state.id_personne;
-        const id_inscrit = this.state.id_inscrit;
+        const nom_inscrit = this.state.nom_inscrit;
         const prenom = this.state.prenom;
         const nom = this.state.nom;
         const paiement = this.state.paiement;
@@ -179,7 +179,7 @@ class Accompagnant extends React.Component {
             <div className="card">
                 <div className="card-content">
                     <p className="subtitle">
-                        {prenom} {nom}
+                        {prenom} {nom} (accompagne "{nom_inscrit}")
 
                         { validation &&
                             <span className="tag is-success is-medium">
