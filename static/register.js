@@ -36,6 +36,7 @@ class Accompagnant extends React.Component {
 class ListeAccompagnant extends React.Component {
     render() {
         const counter = this.props.counter;
+        const max = this.props.max;
         const map_array = Array.apply(null, {length: counter}).map(Number.call, Number);
         const liste =  map_array.map((number) =>
             <Accompagnant key={number} number={number + 1} />
@@ -46,7 +47,7 @@ class ListeAccompagnant extends React.Component {
                 <div className="field is-horizontal">
                     <div className="field-label" />
                     <div className="field-body">
-                        { counter < 10 &&
+                        { counter < max &&
                             <div className="field">
                                 <div className="control">
                                     <a href="#" className="button" onClick={this.props.ajoutAccompagnateur}>
@@ -100,7 +101,8 @@ class Validation extends React.Component {
                 form_data.append(formulaire[i].name, formulaire[i].value);
             }
         }
-        const courriel = document.getElementById("courriel").value
+        const courriel = document.getElementById("courriel").value;
+        const total_paye = document.getElementById("totalpaye").textContent;
 
         fetch("/register", {
             method: "POST",
@@ -109,7 +111,7 @@ class Validation extends React.Component {
         })
         .then((response) => response.json())
         .then((data) => {
-            document.location.href = "/registered?courriel=" + courriel;
+            document.location.href = "/registered?courriel=" + courriel + "&paye=" + total_paye;
         })
         .catch((error) => {
             this.setState({error: true});
@@ -146,10 +148,11 @@ class Validation extends React.Component {
 
 class Devis extends React.Component {
     render() {
+        const etudiant = this.props.etudiant;
         const sortant = this.props.sortant;
         const nb_acc = this.props.nb_acc;
-        const total_acc = nb_acc * cout_acc;
-        const total = total_acc + ((sortant)?cout_sortant:0);
+        const total_acc = nb_acc * cout_acc * (etudiant ? 1 : 0);
+        const total = total_acc + (sortant ? cout_sortant : 0);
         return (
             <section className="section">
                 <h2 className="subtitle">
@@ -169,7 +172,7 @@ class Devis extends React.Component {
                             <th>Total</th>
                             <th></th>
                             <th></th>
-                            <th>{total}</th>
+                            <th id="totalpaye">{total}</th>
                         </tr>
                     </tfoot>
                     <tbody>
@@ -193,7 +196,12 @@ class Devis extends React.Component {
                             <tr>
                                 <td>Accompagnant{nb_acc > 1 && 's'}</td>
                                 <td>{nb_acc}</td>
-                                <td>{cout_acc}</td>
+                                { etudiant &&
+                                    <td>{cout_acc}</td>
+                                }
+                                { ! etudiant &&
+                                    <td>0</td>
+                                }
                                 <td>{total_acc}</td>
                             </tr>
                         }
@@ -207,22 +215,32 @@ class Devis extends React.Component {
 class Inscription extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {error: false, counter: 0, selected_type: 'etudiant', selected_year: '2017'};
+        this.state = {
+            error: false,
+            counter: 0,
+            selected_type: 'etudiant',
+            selected_year: '2017',
+            maxacc: 10
+        };
         this.ajoutAccompagnateur = this.ajoutAccompagnateur.bind(this);
         this.enleverAccompagnateur = this.enleverAccompagnateur.bind(this);
         this.handleTypeChange = this.handleTypeChange.bind(this);
         this.handleYearChange = this.handleYearChange.bind(this);
     }
     ajoutAccompagnateur (e) {
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
         this.setState(function(prevState) {
             return {
-                counter: (prevState.counter < 10) ? prevState.counter + 1 : 10
+                counter: (prevState.counter < this.state.maxacc) ? prevState.counter + 1 : this.state.maxacc
             };
         });
     }
     enleverAccompagnateur (e) {
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
         this.setState(function(prevState) {
             return {
                 counter: (prevState.counter > 0) ? prevState.counter - 1 : 0
@@ -233,10 +251,29 @@ class Inscription extends React.Component {
         this.setState({selected_type: changeEvent.target.value });
         if (changeEvent.target.value !== 'etudiant') {
             this.setState({selected_year: ''});
+            this.setState({maxacc: 1});
+            if (this.state.counter > 1) {
+                for (var i = this.state.counter; i > 1; i = i -1) {
+                    this.enleverAccompagnateur();
+                }
+            }
+        } else {
+            this.setState({selected_year: '2017'});
+            this.setState({maxacc: 10});
         }
     }
     handleYearChange (changeEvent) {
         this.setState({selected_year: changeEvent.target.value });
+        if (changeEvent.target.value !== '2017') {
+            this.setState({maxacc: 1});
+            if (this.state.counter > 1) {
+                for (var i = this.state.counter; i > 1; i = i -1) {
+                    this.enleverAccompagnateur();
+                }
+            }
+        } else {
+            this.setState({maxacc: 10});
+        }
     }
     render() {
         const error = this.state.error;
@@ -348,9 +385,9 @@ class Inscription extends React.Component {
                     <h2 className="subtitle">
                         Accompagnateur(s)
                     </h2>
-                    <ListeAccompagnant ajoutAccompagnateur={this.ajoutAccompagnateur} enleverAccompagnateur={this.enleverAccompagnateur} counter={this.state.counter} />
+                    <ListeAccompagnant ajoutAccompagnateur={this.ajoutAccompagnateur} enleverAccompagnateur={this.enleverAccompagnateur} counter={this.state.counter} max={this.state.maxacc}/>
                 </section>
-                <Devis nb_acc={this.state.counter} sortant={this.state.selected_type === 'etudiant' && this.state.selected_year === '2017'}/>
+                <Devis nb_acc={this.state.counter} etudiant={this.state.selected_type === 'etudiant'} sortant={this.state.selected_year === '2017'}/>
                 <section className="section">
                     <Validation />
                 </section>

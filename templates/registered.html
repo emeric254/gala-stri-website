@@ -33,7 +33,28 @@
                     </div>
                 </div>
             </section>
-
+            {% if paye and paye != '0' %}
+            <section class="section">
+                <div class="container">
+                    <div class="heading">
+                        <h1 class="title">
+                            <i class="fa fa-dollar"></i>
+                            Paiement
+                        </h1>
+                        <h2 class="subtitle">
+                        </h2>
+                        <div class="content has-text-centered">
+                            <a class="button is-primary" href="https://lydia-app.com/collect/paiement-ceremonie-des-alumni-19663">
+                                Payer directement en ligne
+                            </a>
+                            <a class="button" href="mailto:contact@gala.stri">
+                                ou nous contacter
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% end %}
         </div>
     </body>
 </html>

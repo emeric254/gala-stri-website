@@ -13,7 +13,8 @@ class RegisteredHandler(BaseHandler):
     def get(self):
         """Serve Get and return registered/confirmation page"""
         courriel = self.get_query_argument('courriel', default='')
+        paye = self.get_query_argument('paye', default='')
         if courriel:
-            self.render('registered.html', courriel=courriel)
+            self.render('registered.html', courriel=courriel, paye=paye)
             return
         self.redirect('/')

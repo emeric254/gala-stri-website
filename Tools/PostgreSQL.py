@@ -125,8 +125,7 @@ def get_all_inscrit():
 def get_all_accompagnants():
     with get_session() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT p.id, a.f_id_personne, a.f_id_inscrit, "
-                        "p.prenom, p.nom, p.status, p.paiement, a.validation "
+            cur.execute("SELECT p.id, a.f_id_inscrit, p.prenom, p.nom, p.status, p.paiement, a.validation "
                         "FROM personnes p, accompagnants a "
                         "WHERE p.id = a.f_id_personne "
                         "ORDER BY a.validation, p.status, p.id DESC;")
